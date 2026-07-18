@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="login-box">
+
+    <h1>SOC REGISTRATION</h1>
+    
+    {% if error %}
+    <div class="alert alert-danger py-2" role="alert" style="font-size: 14px; background-color: #ff3b30; color: white; border: none; border-radius: 8px; margin-bottom: 20px;">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    {% if success %}
+    <div class="alert alert-success py-2" role="alert" style="font-size: 14px; background-color: #2ecc71; color: white; border: none; border-radius: 8px; margin-bottom: 20px;">
+        {{ success }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Choose Username" required>
+        <input type="password" name="password" placeholder="Choose Password" required>
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+        <button type="submit">REGISTER</button>
+    </form>
+    
+    <p style="margin-top: 25px; font-size: 14px; color: #94a3b8;">
+        Already have an account? <a href="/" style="color: cyan; text-decoration: none; font-weight: bold;">Login here</a>
+    </p>
+
+</div>
+{% endblock %}

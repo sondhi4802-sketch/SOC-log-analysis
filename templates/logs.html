@@ -1,0 +1,221 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+
+.logs-container{
+    padding:30px;
+}
+
+.logs-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.logs-header h2{
+    color:#00e5ff;
+}
+
+.search-box{
+    width:300px;
+}
+
+.search-box input{
+    width:100%;
+    padding:12px;
+    border:none;
+    outline:none;
+    border-radius:8px;
+    background:#1b263b;
+    color:white;
+}
+
+.table-container{
+
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,229,255,.2);
+
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+
+    background:#00e5ff;
+    color:#000;
+
+}
+
+th,td{
+
+    padding:15px;
+    text-align:left;
+
+}
+
+tbody tr{
+
+    border-bottom:1px solid #2d3e50;
+
+}
+
+tbody tr:hover{
+
+    background:#263449;
+
+}
+
+.badge{
+
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:bold;
+
+}
+
+.failed{
+
+    background:#ff4d4d;
+    color:white;
+
+}
+
+.success{
+
+    background:#2ecc71;
+    color:white;
+
+}
+
+.sql{
+
+    background:#9b59b6;
+    color:white;
+
+}
+
+.ip{
+
+    background:#f39c12;
+    color:white;
+
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="logs-container">
+
+    <div class="logs-header">
+
+        <h2>System Logs</h2>
+
+        <div class="search-box">
+
+            <input
+            type="text"
+            id="search"
+            placeholder="Search logs..."
+            onkeyup="searchLogs()"
+            >
+
+        </div>
+
+    </div>
+
+    <div class="table-container">
+
+        <table id="logTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>#</th>
+                    <th>Log Entry</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for log in logs %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+
+                    <td>{{ log }}</td>
+
+                    <td>
+
+                    {% if "FAILED LOGIN" in log %}
+
+                    <span class="badge failed">FAILED LOGIN</span>
+
+                    {% elif "ADMIN LOGIN" in log %}
+
+                    <span class="badge success">ADMIN LOGIN</span>
+
+                    {% elif "SQL INJECTION" in log %}
+
+                    <span class="badge sql">SQL INJECTION</span>
+
+                    {% elif "SUSPICIOUS IP" in log %}
+
+                    <span class="badge ip">SUSPICIOUS IP</span>
+
+                    {% else %}
+
+                    <span class="badge success">NORMAL</span>
+
+                    {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+function searchLogs(){
+
+let input=document.getElementById("search").value.toLowerCase();
+
+let rows=document.querySelectorAll("#logTable tbody tr");
+
+rows.forEach(row=>{
+
+let text=row.innerText.toLowerCase();
+
+row.style.display=text.includes(input)?"":"none";
+
+});
+
+}
+
+</script>
+
+{% endblock %}

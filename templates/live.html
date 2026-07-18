@@ -1,0 +1,534 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<style>
+.live-container {
+    padding: 30px;
+    animation: fadeIn 0.8s ease-out;
+}
+.live-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.live-header h2 {
+    color: #00e5ff;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 0;
+}
+.status-beacon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #2ecc71;
+    box-shadow: 0 0 10px #2ecc71;
+}
+.status-beacon.stopped {
+    background-color: #ff3b30;
+    box-shadow: 0 0 10px #ff3b30;
+}
+.status-beacon.pulsing {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 15px currentColor;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+}
+
+.controls-box {
+    display: flex;
+    gap: 15px;
+}
+.btn-live {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-live-toggle {
+    background: #00e5ff;
+    color: black;
+}
+.btn-live-toggle.active {
+    background: #ff3b30;
+    color: white;
+}
+.btn-live-clear {
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+}
+.btn-live:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+}
+
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+.metric-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.metric-card:hover {
+    border-color: #00e5ff;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+}
+.metric-card h3 {
+    font-size: 15px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+.metric-card h1 {
+    font-size: 38px;
+    color: #00e5ff;
+    margin: 0;
+    font-weight: 700;
+}
+.metric-card.threat-card h1 {
+    color: #ff4d4d;
+}
+.metric-card.threat-card.active {
+    border-color: #ff3b30;
+    animation: threatAlert 1s infinite alternate;
+}
+
+@keyframes threatAlert {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 59, 48, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 59, 48, 0.5);
+    }
+}
+
+.live-layout {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr;
+    gap: 25px;
+}
+.live-feed-box {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 229, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+.chart-box {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 229, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    height: fit-content;
+}
+.feed-table-container {
+    max-height: 480px;
+    overflow-y: auto;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+.feed-table-container::-webkit-scrollbar {
+    width: 6px;
+}
+.feed-table-container::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+th {
+    background: #1e293b;
+    color: #00e5ff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+}
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #2d3e50;
+    font-size: 13.5px;
+    color: #cbd5e1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+tr {
+    transition: all 0.3s ease;
+}
+tr.new-row {
+    animation: slideInRow 0.5s ease-out;
+}
+tr.threat-row {
+    background: rgba(255, 59, 48, 0.15);
+}
+tr.threat-row:hover {
+    background: rgba(255, 59, 48, 0.25) !important;
+}
+tbody tr:hover {
+    background: rgba(38, 52, 73, 0.5);
+}
+
+@keyframes slideInRow {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+        background-color: rgba(0, 229, 255, 0.2);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        background-color: transparent;
+    }
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 11px;
+}
+.badge.tcp { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+.badge.udp { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+.badge.http { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+.badge.dns { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid #8b5cf6; }
+.badge.icmp { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid #ec4899; }
+.badge.threat { background: #ff3b30; color: white; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="live-container">
+    
+    <div class="live-header">
+        <h2>
+            <span id="captureStatusBeacon" class="status-beacon pulsing"></span>
+            Live Network Monitor
+            <span id="captureStatusText" style="font-size: 14px; font-weight: normal; color: #94a3b8;">Capturing...</span>
+        </h2>
+        <div class="controls-box">
+            <button id="btnToggleCapture" class="btn-live btn-live-toggle active" onclick="toggleCapture()">
+                <i class="fas fa-pause"></i> Stop Capture
+            </button>
+            <button class="btn-live btn-live-clear" onclick="clearCapture()">
+                <i class="fas fa-trash-alt"></i> Clear Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Alert Banner -->
+    <div id="errorBanner" class="alert alert-danger py-3 px-4" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 12px; color: #fca5a5; margin-bottom: 25px; font-weight: 500;">
+        <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+        <span id="errorText"></span>
+    </div>
+
+    <!-- Live Performance Cards -->
+    <div class="metrics-row">
+        <div class="metric-card">
+            <h3>Packets Sniffed</h3>
+            <h1 id="countPackets">0</h1>
+        </div>
+        <div id="threatCard" class="metric-card threat-card">
+            <h3>Intrusions Blocked</h3>
+            <h1 id="countThreats">0</h1>
+        </div>
+        <div class="metric-card">
+            <h3>Traffic Volume</h3>
+            <h1 id="countBytes">0 KB</h1>
+        </div>
+    </div>
+
+    <!-- Live Split Layout -->
+    <div class="live-layout">
+        
+        <div class="live-feed-box">
+            <h4 style="color: #00e5ff; margin-bottom: 15px; font-weight: 600;">Packet Capture Stream</h4>
+            <div class="feed-table-container">
+                <table id="packetTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 18%;">Timestamp</th>
+                            <th style="width: 15%;">Source</th>
+                            <th style="width: 15%;">Destination</th>
+                            <th style="width: 10%;">Protocol</th>
+                            <th style="width: 10%;">Length</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packetStream">
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Listening on network interfaces...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <h4 style="color: #00e5ff; margin-bottom: 20px; font-weight: 600; text-align: center;">Protocol Distribution</h4>
+            <canvas id="protocolChart" style="max-height: 250px; max-width: 250px; margin: 0 auto;"></canvas>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let lastPacketTimestamp = "";
+let protocolChartInstance = null;
+let pollInterval = null;
+
+// Initialize Chart
+function initChart() {
+    const ctx = document.getElementById("protocolChart").getContext("2d");
+    protocolChartInstance = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["TCP", "UDP", "HTTP", "DNS", "ICMP"],
+            datasets: [{
+                data: [0, 0, 0, 0, 0],
+                backgroundColor: [
+                    "rgba(59, 130, 246, 0.6)",  // TCP
+                    "rgba(245, 158, 11, 0.6)",  // UDP
+                    "rgba(16, 185, 129, 0.6)",  // HTTP
+                    "rgba(139, 92, 246, 0.6)",  // DNS
+                    "rgba(236, 72, 153, 0.6)"   // ICMP
+                ],
+                borderColor: [
+                    "#3b82f6",
+                    "#f59e0b",
+                    "#10b981",
+                    "#8b5cf6",
+                    "#ec4899"
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#94a3b8',
+                        font: { size: 11 }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateChart(counts) {
+    if (protocolChartInstance) {
+        protocolChartInstance.data.datasets[0].data = [
+            counts.TCP || 0,
+            counts.UDP || 0,
+            counts.HTTP || 0,
+            counts.DNS || 0,
+            counts.ICMP || 0
+        ];
+        protocolChartInstance.update();
+    }
+}
+
+// Fetch live packets
+async function fetchLivePackets() {
+    try {
+        const response = await fetch("/api/live_packets");
+        const data = await response.json();
+        
+        // Update Error Banner
+        const errorBanner = document.getElementById("errorBanner");
+        if (data.metrics && data.metrics.error) {
+            document.getElementById("errorText").innerText = data.metrics.error;
+            errorBanner.style.display = "block";
+        } else {
+            errorBanner.style.display = "none";
+        }
+        
+        // Update Metrics
+        document.getElementById("countPackets").innerText = data.metrics.total_captured;
+        document.getElementById("countThreats").innerText = data.metrics.threat_count;
+        
+        // Threat Card Alert State
+        const threatCard = document.getElementById("threatCard");
+        if (data.metrics.threat_count > 0) {
+            threatCard.classList.add("active");
+            threatCard.style.color = "#ff3b30";
+        } else {
+            threatCard.classList.remove("active");
+            threatCard.style.color = "";
+        }
+
+        // Format Bytes
+        let bytes = data.metrics.total_bytes;
+        if (bytes > 1024 * 1024) {
+            document.getElementById("countBytes").innerText = (bytes / (1024 * 1024)).toFixed(2) + " MB";
+        } else if (bytes > 1024) {
+            document.getElementById("countBytes").innerText = (bytes / 1024).toFixed(1) + " KB";
+        } else {
+            document.getElementById("countBytes").innerText = bytes + " B";
+        }
+
+        // Update Capturer status UI
+        updateStatusUI(data.metrics.running);
+
+        // Populate Table
+        const streamContainer = document.getElementById("packetStream");
+        const packets = data.packets;
+
+        if (packets.length === 0) {
+            streamContainer.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No packets captured yet.</td></tr>`;
+            updateChart({});
+            return;
+        }
+
+        // Calculate Protocol Distribution counts
+        let protoCounts = { TCP: 0, UDP: 0, HTTP: 0, DNS: 0, ICMP: 0 };
+        
+        let rowsHtml = "";
+        packets.forEach((pkt, idx) => {
+            // Count protocols
+            if (protoCounts[pkt.proto] !== undefined) {
+                protoCounts[pkt.proto]++;
+            }
+            
+            const isThreat = pkt.threat;
+            const rowClass = isThreat ? "threat-row" : "";
+            const newClass = (idx === 0 && lastPacketTimestamp !== pkt.timestamp) ? "new-row" : "";
+            const badgeClass = pkt.proto.toLowerCase();
+            
+            let details = pkt.info;
+            if (isThreat) {
+                details = `<span class="badge threat"><i class="fas fa-exclamation-triangle"></i> ${pkt.threat_type}</span> ${pkt.info}`;
+            }
+
+            rowsHtml += `
+                <tr class="${rowClass} ${newClass}">
+                    <td>${pkt.timestamp}</td>
+                    <td>${pkt.src}</td>
+                    <td>${pkt.dest}</td>
+                    <td><span class="badge ${badgeClass}">${pkt.proto}</span></td>
+                    <td>${pkt.length} B</td>
+                    <td>${details}</td>
+                </tr>
+            `;
+        });
+
+        streamContainer.innerHTML = rowsHtml;
+        updateChart(protoCounts);
+
+        if (packets.length > 0) {
+            lastPacketTimestamp = packets[0].timestamp;
+        }
+
+    } catch (err) {
+        console.error("Error polling packets: ", err);
+    }
+}
+
+function updateStatusUI(running) {
+    const beacon = document.getElementById("captureStatusBeacon");
+    const statusText = document.getElementById("captureStatusText");
+    const btn = document.getElementById("btnToggleCapture");
+
+    if (running) {
+        beacon.className = "status-beacon pulsing";
+        beacon.style.color = "#2ecc71";
+        statusText.innerText = "Capturing network interfaces...";
+        statusText.style.color = "#94a3b8";
+        btn.className = "btn-live btn-live-toggle active";
+        btn.innerHTML = `<i class="fas fa-pause"></i> Stop Capture`;
+    } else {
+        beacon.className = "status-beacon stopped";
+        beacon.style.color = "#ff3b30";
+        statusText.innerText = "Capturer stopped.";
+        statusText.style.color = "#ff4d4d";
+        btn.className = "btn-live btn-live-toggle";
+        btn.innerHTML = `<i class="fas fa-play"></i> Start Capture`;
+    }
+}
+
+async function toggleCapture() {
+    try {
+        const res = await fetch("/api/toggle_capture", { method: "POST" });
+        const data = await res.json();
+        updateStatusUI(data.running);
+    } catch (err) {
+        console.error("Error toggling capture: ", err);
+    }
+}
+
+async function clearCapture() {
+    if (confirm("Clear packet buffer and reset sniffer stats?")) {
+        try {
+            await fetch("/api/clear_capture", { method: "POST" });
+            fetchLivePackets();
+        } catch (err) {
+            console.error("Error clearing capture: ", err);
+        }
+    }
+}
+
+// Start polling on load
+window.addEventListener("DOMContentLoaded", () => {
+    initChart();
+    fetchLivePackets();
+    pollInterval = setInterval(fetchLivePackets, 1500);
+});
+
+// Clean up interval on close
+window.addEventListener("beforeunload", () => {
+    if (pollInterval) clearInterval(pollInterval);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+
+<style>
+
+.upload-container{
+
+    width:700px;
+    margin:50px auto;
+    background:#1b263b;
+    padding:40px;
+    border-radius:15px;
+    box-shadow:0 0 25px rgba(0,229,255,.3);
+
+}
+
+.upload-container h2{
+
+    color:#00e5ff;
+    margin-bottom:30px;
+    text-align:center;
+
+}
+
+.upload-box{
+
+    border:2px dashed #00e5ff;
+    padding:40px;
+    text-align:center;
+    border-radius:10px;
+
+}
+
+.upload-box input{
+
+    margin-top:20px;
+
+}
+
+button{
+
+    margin-top:25px;
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#00e5ff;
+    color:black;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+
+}
+
+button:hover{
+
+    background:#00bcd4;
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="upload-container">
+
+<h2>Upload Log File</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="upload-box">
+
+<i class="fas fa-upload fa-3x"></i>
+
+<br><br>
+
+<input
+type="file"
+name="logfile"
+accept=".txt,.log"
+required>
+
+</div>
+
+<button>
+
+Upload & Analyze
+
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

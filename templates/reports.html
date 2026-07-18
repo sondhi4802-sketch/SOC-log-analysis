@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<style>
+.reports-container {
+    padding: 30px;
+}
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.reports-header h2 {
+    color: #00e5ff;
+}
+.table-container {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,229,255,.2);
+}
+.table-container h4 {
+    color: white;
+    margin-bottom: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th {
+    background: #00e5ff !important;
+    color: black !important;
+    padding: 15px;
+}
+td {
+    padding: 15px;
+    border-bottom: 1px solid #333;
+}
+.btn-cyan {
+    background: #00e5ff;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+.btn-cyan:hover {
+    background: #00bcd4;
+    color: black;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <div class="reports-header">
+        <h2>SOC Log Report</h2>
+        <a href="/download_report" class="btn-cyan">
+            <i class="fas fa-download"></i> Download Report
+        </a>
+    </div>
+
+    <div class="table-container">
+        <h4>Total Alerts Generated: {{ total }}</h4>
+        <hr style="border-color: #2d3e50; margin-bottom: 20px;">
+        
+        <table class="table table-dark table-striped table-hover">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">#</th>
+                    <th>Alert Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if alerts %}
+                    {% for alert in alerts %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ alert }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="2" class="text-center">No alerts to include in report.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

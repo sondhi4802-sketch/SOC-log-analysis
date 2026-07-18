@@ -1,0 +1,289 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Dashboard Cards -->
+
+<div class="cards">
+
+    <div class="card">
+        <h3>Total Logs</h3>
+        <h1 class="counter" data-target="{{ total_logs }}">0</h1>
+    </div>
+
+    <div class="card">
+        <h3>Total Alerts</h3>
+        <h1 class="counter" data-target="{{ total_alerts }}">0</h1>
+    </div>
+
+    <div class="card">
+        <h3>Brute Force</h3>
+        <h1 class="counter" data-target="{{ brute_force }}">0</h1>
+    </div>
+
+    <div class="card">
+        <h3>SQL Injection</h3>
+        <h1 class="counter" data-target="{{ sql_injection }}">0</h1>
+    </div>
+
+    <div class="card">
+        <h3>Risk Score</h3>
+        <h1>{{ risk_score }}%</h1>
+
+        <p style="color:#00e5ff;font-weight:bold;margin-top:10px;">
+            {{ threat_level }}
+        </p>
+    </div>
+    <div class="card ai-card">
+    <h3>AI Prediction</h3>
+
+    {% if ml_prediction == 1 %}
+
+        <h1 style="color:#ff3b3b;">⚠ Attack</h1>
+
+        <p style="color:#ff3b3b;">
+            Attack
+        </p>
+
+    {% else %}
+
+        <h1 style="color:#00ff99;">✓</h1>
+
+        <p style="color:#00ff99;">
+            Normal Traffic
+        </p>
+
+    {% endif %}
+
+</div>
+
+</div>
+
+<!-- Graph -->
+
+<div class="graph">
+
+    <h2 style="color:#00e5ff;margin-bottom:20px;">
+        Attack Distribution
+    </h2>
+
+    <canvas id="attackChart"
+            data-brute="{{ brute_force }}"
+            data-sql="{{ sql_injection }}"
+            data-ip="{{ suspicious_ip }}"
+            data-admin="{{ admin_login }}">
+    </canvas>
+
+</div>
+
+<!-- Alerts -->
+
+<div class="graph">
+
+    <h2 style="color:#00e5ff;margin-bottom:20px;">
+        Recent Alerts
+    </h2>
+
+    <div class="alert-feed">
+
+    {% if alerts %}
+
+        {% for alert in alerts %}
+
+        <div class="alert-item
+
+        {% if '[CRITICAL]' in alert %}
+            critical
+        {% elif '[HIGH]' in alert %}
+            high
+        {% elif '[MEDIUM]' in alert %}
+            medium
+        {% else %}
+            low
+        {% endif %}
+
+        ">
+
+            {{ alert }}
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert-item low">
+            No Alerts Found
+        </div>
+
+    {% endif %}
+
+    </div>
+
+</div>
+
+<!-- Top Attacker IPs -->
+
+<div class="graph">
+
+    <h2>Top Attacker IPs</h2>
+
+    <table class="table table-dark table-hover">
+
+        <thead>
+
+            <tr>
+
+                <th>Rank</th>
+                <th>IP Address</th>
+                <th>Attack Count</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+{% if top_ips %}
+
+    {% for ip in top_ips %}
+
+    <tr>
+
+        <td>{{ loop.index }}</td>
+
+        <td>{{ ip.address }}</td>
+
+        <td>{{ ip.count }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+{% else %}
+
+<tr>
+
+<td colspan="3" style="text-align:center;color:#00e5ff;">
+No attacker IPs found
+</td>
+
+</tr>
+
+{% endif %}
+
+</tbody>
+
+    </table>
+
+</div>
+
+<!-- ========================= -->
+<!-- Attack Timeline -->
+<!-- ========================= -->
+
+<div class="timeline-card">
+
+    <h2>
+
+        <i class="fas fa-history"></i>
+
+        Attack Timeline
+
+    </h2>
+
+    <div class="timeline">
+
+        <div class="timeline-item">
+
+            <span class="time">12:31:02</span>
+
+            <span class="event critical">
+
+                SQL Injection Detected
+
+            </span>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <span class="time">12:32:11</span>
+
+            <span class="event danger">
+
+                Brute Force Login
+
+            </span>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <span class="time">12:33:40</span>
+
+            <span class="event warning">
+
+                Suspicious IP
+
+            </span>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <span class="time">12:35:05</span>
+
+            <span class="event info">
+
+                Admin Login
+
+            </span>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <span class="time">12:36:18</span>
+
+            <span class="event success">
+
+                Incident Report Generated
+
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Toast -->
+
+<div id="toast" class="toast">
+
+    <i class="fas fa-shield-alt"></i>
+
+    <span id="toastMessage">
+
+        SOC Monitoring Started
+
+    </span>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+==================================================
+SOC DAILY REPORT
+==================================================
+
+Generated : 2026-07-16 15:42:06.841181
+
+Total Alerts : 17
+Critical : 5
+High : 10
+Medium : 2
+
+Alert Details
+--------------------------------------------------
+[CRITICAL] Brute Force Attack - 15 failed login attempts detected.
+[MEDIUM] Admin Login - Administrator login detected.
+[MEDIUM] Admin Login - Administrator login detected.
+[CRITICAL] SQL Injection - Possible SQL Injection detected.
+[CRITICAL] SQL Injection - Possible SQL Injection detected.
+[CRITICAL] SQL Injection - Possible SQL Injection detected.
+[CRITICAL] SQL Injection - Possible SQL Injection detected.
+[HIGH] Suspicious IP - Host 192.168.1.100 flagged for multiple authentication failures (5 failed attempts)
+[HIGH] Suspicious IP - Malicious traffic detected from host: 203.45.65.11
+[HIGH] Suspicious IP - Malicious traffic detected from host: 203.45.65.11
+[HIGH] Suspicious IP - Malicious traffic detected from host: 203.45.65.11
+[HIGH] Suspicious IP - Malicious traffic detected from host: 185.220.101.15
+[HIGH] Suspicious IP - Malicious traffic detected from host: 103.45.78.90
+[HIGH] Suspicious IP - Host 192.168.1.200 flagged for multiple authentication failures (5 failed attempts)
+[HIGH] Suspicious IP - Malicious traffic detected from host: 45.67.89.123
+[HIGH] Suspicious IP - Malicious traffic detected from host: 45.67.89.123
+[HIGH] Suspicious IP - Host 172.16.1.50 flagged for multiple authentication failures (5 failed attempts)

@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+{% for category,message in messages %}
+
+<div class="alert alert-success">
+
+    {{ message }}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-info">
+        <i class="fas fa-shield-alt"></i>
+        Incident Response Center
+    </h2>
+
+    <table class="table table-dark table-hover">
+
+        <thead>
+
+            <tr>
+                <th>Threat</th>
+                <th>Severity</th>
+                <th>Recommended Action</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td>SQL Injection</td>
+                <td><span class="badge bg-danger">Critical</span></td>
+                <td>Block attacker IP and inspect web server logs.</td>
+            </tr>
+
+            <tr>
+                <td>Brute Force</td>
+                <td><span class="badge bg-danger">Critical</span></td>
+                <td>Lock user account after repeated failures.</td>
+            </tr>
+
+            <tr>
+                <td>Suspicious IP</td>
+                <td><span class="badge bg-warning text-dark">High</span></td>
+                <td>Add IP to firewall blocklist.</td>
+            </tr>
+
+            <tr>
+                <td>Admin Login</td>
+                <td><span class="badge bg-primary">Medium</span></td>
+                <td>Verify administrator activity and MFA logs.</td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+    <div class="mt-4">
+
+    <div class="action-buttons">
+
+        <!-- Block IP -->
+        <form action="/block_ip" method="POST"
+              onsubmit="return confirm('Block this IP?')">
+
+            <input type="hidden"
+                   name="ip"
+                   value="203.45.65.11">
+
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-ban"></i>
+                Block IP
+            </button>
+
+        </form>
+
+        <!-- Isolate Host -->
+        <form action="/isolate_host" method="POST">
+
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-network-wired"></i>
+                Isolate Host
+            </button>
+
+        </form>
+
+        <!-- Generate Report -->
+        <form action="/generate_incident_report" method="POST">
+
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-file-download"></i>
+                Generate Incident Report
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+</div>
+
+{% endblock %}

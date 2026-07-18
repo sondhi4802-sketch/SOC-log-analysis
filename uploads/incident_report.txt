@@ -1,0 +1,14 @@
+SOC Incident Report
+=========================
+
+Threats Detected:
+- SQL Injection
+- Brute Force
+- Suspicious IP
+- Admin Login
+
+Recommended Actions:
+• Block malicious IPs
+• Isolate affected host
+• Review server logs
+• Reset compromised accounts
